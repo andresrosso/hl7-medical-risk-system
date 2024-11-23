@@ -1,7 +1,5 @@
 # hl7-medical-risk-system
 
-``` graphql
-
 Aquí está la versión actualizada de las instrucciones en tercera persona para el proyecto hl7-medical-risk-system.
 
 Paso 1: Clonar el Repositorio
@@ -14,7 +12,7 @@ cd hl7-medical-risk-system
 Paso 2: Estructura del Proyecto
 El proyecto debe organizarse de la siguiente manera:
 
-graphql
+``` graphql
 Copy code
 hl7-medical-risk-system/
 ├── docker-compose.yml      # Define los servicios y puertos
