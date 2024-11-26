@@ -12,6 +12,17 @@ const createPatient = async (data) => {
     return response.data.id;
 };
 
+async function searchRiskAssessments(patientId) {
+    const url = `${FHIR_SERVER_URL}/RiskAssessment?subject=Patient/${patientId}`;
+    const response = await axios.get(url, { headers: { Accept: "application/json" } });
+    return response.data.entry?.map((entry) => entry.resource) || [];
+}
+
+async function deleteResource(resourceType, resourceId) {
+    const url = `${FHIR_SERVER_URL}/${resourceType}/${resourceId}`;
+    await axios.delete(url, { headers: { Accept: "application/json" } });
+}
+
 const createObservations = async (patientId, data) => {
     const observations = [
         { code: "39156-5", display: "BMI", value: data.BMI, unit: "kg/m2" },
@@ -112,6 +123,18 @@ const deletePatient = async (patientId) => {
             }
         }
 
+        // Delete RiskAssessments
+        const riskAssessmentsResponse = await axios.get(`${FHIR_SERVER_URL}/RiskAssessment?subject=Patient/${patientId}`);
+        const riskAssessments = riskAssessmentsResponse.data.entry || [];
+
+        if (Array.isArray(riskAssessments)) {
+            for (const riskAssessment of riskAssessments) {
+                await deleteResource("RiskAssessment", riskAssessment.resource.id);
+            }
+        } else {
+            console.warn(`Expected array for RiskAssessments but got:`, riskAssessments);
+        }
+
         // Delete the Patient
         await axios.delete(`${FHIR_SERVER_URL}/Patient/${patientId}`);
         console.log(`Patient ${patientId} and related resources deleted successfully.`);
@@ -162,6 +185,8 @@ const getAllPatients = async () => {
 
 
 module.exports = {
+    searchRiskAssessments,
+    deleteResource,
     createPatient,
     createObservations,
     createConditions,

@@ -2,7 +2,9 @@ import logging
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import requests
+import joblib
 
+MODEL_PATH = "random_forest_model.joblib"
 # Configuración de logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -147,7 +149,7 @@ def extract_patient_data(age, gender, observations, conditions, medication_statu
 def calculate_risk(data):
     """
     Calcular el riesgo basado en las 15 variables.
-    """
+    
     risk_score = (
         (data["age"] or 0) / 100 +
         (data["BMI"] or 0) / 40 +
@@ -165,8 +167,55 @@ def calculate_risk(data):
         (data["education"] or 0) / 4 +
         (data["cigsPerDay"] or 0) / 40
     ) / 15
+    """
+    logging.info("Making a prediction for patient")
+    risk_score = get_prediction(data)
+    logging.info("The stimated risk score is {}".format(risk_score))
     return risk_score
 
+def get_prediction(data):
+    """
+    Load the trained model and use it to predict the risk based on patient data.
+    """
+    try:
+        # Load the trained model
+        logging.info("Loading the trained model...")
+        model = joblib.load(MODEL_PATH)
+        logging.info("Model loaded successfully.")
+
+        # Ensure data is in the correct format for prediction
+        input_data = [
+            [
+                data["age"],
+                data["gender"],
+                data["BPMeds"],
+                data["BMI"],
+                data["totChol"],
+                data["sysBP"],
+                data["diaBP"],
+                data["glucose"],
+                data["heartRate"],
+                data["is_smoking"],
+                data["education"],
+                data["cigsPerDay"],
+                data["prevalentStroke"],
+                data["prevalentHyp"],
+                data["diabetes"]
+            ]
+        ]
+
+        # Make the prediction
+        logging.info("Making prediction...")
+        prediction = model.predict_proba(input_data)[0][1]  # Probability of the positive class (e.g., "High Risk")
+
+        return prediction
+
+    except FileNotFoundError:
+        logging.error(f"Model file not found at {MODEL_PATH}. Ensure the model is trained and saved.")
+        raise HTTPException(status_code=500, detail="Model file not found.")
+    except Exception as e:
+        logging.error(f"Error during prediction: {e}")
+        raise HTTPException(status_code=500, detail="Error during prediction.")
 
 
 def save_risk_assessment(patient_id, risk_score):

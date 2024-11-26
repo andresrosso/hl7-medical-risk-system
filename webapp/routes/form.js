@@ -11,6 +11,11 @@ router.get("/", (req, res) => {
 // Obtener lista de pacientes
 router.get("/patients", async (req, res) => {
     try {
+        res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+        res.set("Expires", "0");
+        res.set("Pragma", "no-cache");
+        res.set("Surrogate-Control", "no-store");
+        
         const patients = await fhirService.getAllPatients();
         res.json(patients);
     } catch (error) {
@@ -33,6 +38,9 @@ router.post("/submit", async (req, res) => {
         // Obtener predicción
         const prediction = await predictionService.getPrediction(patientId);
 
+        // Fetch updated patient list
+        const patients = await fhirService.getAllPatients();
+
         res.render("result", {
             patientId,
             prediction,
@@ -44,15 +52,15 @@ router.post("/submit", async (req, res) => {
     }
 });
 
-// Ruta para eliminar paciente
-router.post("/delete-patient/:id", async (req, res) => {
+// Eliminar un paciente
+router.post("/delete", async (req, res) => {
+    const { id } = req.body;
     try {
-        const patientId = req.params.id;
-        await fhirService.deletePatient(patientId);
-        res.redirect("/patients");
+        await fhirService.deletePatient(id);
+        res.json({ success: true });
     } catch (error) {
-        console.error(`[ERROR] Error deleting patient: ${error.message}`);
-        res.status(500).send("Error deleting patient");
+        console.error(`[ERROR] ${error.message}`);
+        res.status(500).json({ error: "Error deleting patient." });
     }
 });
 

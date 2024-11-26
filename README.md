@@ -23,35 +23,39 @@ El proyecto debe organizarse de la siguiente manera:
 ## Project Structure
 
 ``` graphql
-Copy code
 hl7-medical-risk-system/
-├── docker-compose.yml      # Define los servicios y puertos
-├── fhir-server/            # Carpeta opcional para configuraciones futuras del servidor FHIR
-├── model-service/          # API del modelo predictivo
+├── docker-compose.yml       # Define los servicios y puertos (FHIR, model-service, webapp)
+├── fhir-server/             # (Opcional) Configuración futura del servidor FHIR
+├── model-service/           # API del modelo predictivo (ML)
 │   ├── Dockerfile
-│   ├── main.py
-│   ├── requirements.txt
-├── webapp/                 # Interfaz web
+│   ├── main.py              # Punto de entrada del servicio
+│   ├── random_forest_model.joblib  # Modelo entrenado (Random Forest)
+│   ├── requirements.txt     # Dependencias del servicio
+├── model-training/          # Entrenamiento de modelos (opcional)
+│   ├── notebooks/
+│   │   ├── train_model.ipynb        # Entrenamiento del modelo
+│   │   ├── cardiovascular-risk.ipynb # Análisis cardiovascular
+│   │   ├── dataset/                 # Datos de entrenamiento
+│   │   └── Log_ROC.png             # Visualización del modelo
+├── webapp/                  # Interfaz web
 │   ├── Dockerfile
 │   ├── public/
-│   │   ├── css/
-│   │   │   └── styles.css    # Estilos personalizados y Bootstrap
-│   │   └── js/
-│   │       └── form.js       # Validación y comportamiento del formulario
+│   │   ├── css/                     # Archivos CSS (estilos)
+│   │   ├── js/                      # Archivos JS para interacción frontend
 │   ├── routes/
-│   │   ├── form.js           # Rutas relacionadas con el formulario
-│   │   ├── fhir.js           # Interacciones con el servidor FHIR
-│   │   └── prediction.js     # Interacciones con el servicio de predicción
+│   │   ├── form.js                  # Lógica del formulario
+│   │   ├── fhir.js                  # Rutas para comunicarse con el servidor FHIR
+│   │   └── prediction.js            # Rutas para conectarse con model-service
 │   ├── services/
-│   │   ├── fhirService.js       # Lógica para comunicarse con el servidor FHIR
-│   │   └── predictionService.js # Lógica para comunicarse con el modelo predictivo
+│   │   ├── fhirService.js           # Cliente para interactuar con el servidor FHIR
+│   │   └── predictionService.js     # Cliente para interactuar con el modelo
 │   ├── views/
-│   │   ├── index.ejs         # Plantilla HTML del formulario
-│   │   └── result.ejs        # Plantilla HTML para mostrar resultados
-│   ├── app.js                # Configuración principal de Express
-│   └── package.json
-├────── .env                  # Generado: Variables de entorno (URLs del servidor)
-│
-│── .gitignore
+│   │   ├── index.ejs                # Página de inicio del formulario
+│   │   └── result.ejs               # Página para mostrar resultados
+│   ├── app.js                       # Configuración de Express.js
+│   └── package.json                 # Dependencias de la webapp
+├── .gitignore
+├── .env                             # Variables de entorno para configuraciones
 └── README.md
+
 ```
