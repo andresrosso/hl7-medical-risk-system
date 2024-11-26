@@ -1,5 +1,13 @@
 # hl7-medical-risk-system
 
+# HL7 Medical Risk System
+
+This project is a modular system for calculating medical risks using HL7 FHIR standards. It includes:
+- **FHIR Server**: A HAPI FHIR server to manage medical records.
+- **Model Service**: A machine learning model API for risk prediction (FastAPI).
+- **WebApp**: A frontend interface to interact with the system (Node.js).
+
+
 Aquí está la versión actualizada de las instrucciones en tercera persona para el proyecto hl7-medical-risk-system.
 
 Paso 1: Clonar el Repositorio
@@ -12,6 +20,8 @@ cd hl7-medical-risk-system
 Paso 2: Estructura del Proyecto
 El proyecto debe organizarse de la siguiente manera:
 
+## Project Structure
+
 ``` graphql
 Copy code
 hl7-medical-risk-system/
@@ -23,8 +33,25 @@ hl7-medical-risk-system/
 │   ├── requirements.txt
 ├── webapp/                 # Interfaz web
 │   ├── Dockerfile
-│   ├── package.json
-│   ├── src/                # Código de la webapp
-├── .gitignore
+│   ├── public/
+│   │   ├── css/
+│   │   │   └── styles.css    # Estilos personalizados y Bootstrap
+│   │   └── js/
+│   │       └── form.js       # Validación y comportamiento del formulario
+│   ├── routes/
+│   │   ├── form.js           # Rutas relacionadas con el formulario
+│   │   ├── fhir.js           # Interacciones con el servidor FHIR
+│   │   └── prediction.js     # Interacciones con el servicio de predicción
+│   ├── services/
+│   │   ├── fhirService.js       # Lógica para comunicarse con el servidor FHIR
+│   │   └── predictionService.js # Lógica para comunicarse con el modelo predictivo
+│   ├── views/
+│   │   ├── index.ejs         # Plantilla HTML del formulario
+│   │   └── result.ejs        # Plantilla HTML para mostrar resultados
+│   ├── app.js                # Configuración principal de Express
+│   └── package.json
+├────── .env                  # Generado: Variables de entorno (URLs del servidor)
+│
+│── .gitignore
 └── README.md
 ```

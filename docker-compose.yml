@@ -1,0 +1,29 @@
+services:
+  fhir-server:
+    image: hapiproject/hapi:v7.6.0
+    container_name: hl7-fhir-server
+    ports:
+      - "8080:8080"
+    volumes:
+      - fhir-data:/data
+
+  model-service:
+    build:
+      context: ./model-service
+    container_name: hl7-model-service
+    ports:
+      - "8000:8000"
+
+  webapp:
+    build:
+      context: ./webapp
+    container_name: hl7-webapp
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./webapp:/app
+    depends_on:
+      - fhir-server
+      - model-service
+volumes:
+  fhir-data:
